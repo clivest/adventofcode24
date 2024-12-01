@@ -8,8 +8,10 @@ jobs:
     # Timeout to protect against flaky tests locking up. Fine to extend
     timeout-minutes: 5
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
       - name: Python dependencies
         run: |
           poetry install
