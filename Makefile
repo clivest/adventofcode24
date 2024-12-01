@@ -1,14 +1,15 @@
 .PHONY: test format lint all
 
 test:
-	pytest tests
+	poetry run pytest tests
 
 
 format:
-	ruff format
+	poetry run ruff format
 
 lint:
-	ruff check
-	mypy aoc24 tests
+	poetry run ruff check
+	poetry run mypy aoc24 tests
+	poetry run ruff format --check
 
 all: format lint test
