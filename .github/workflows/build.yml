@@ -4,7 +4,7 @@ on:
 
 jobs:
   py-test:
-    runs-on: linux
+    runs-on: ubuntu-latest
     # Timeout to protect against flaky tests locking up. Fine to extend
     timeout-minutes: 5
     steps:
