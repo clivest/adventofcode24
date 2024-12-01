@@ -3,7 +3,7 @@ on:
   push:
 
 jobs:
-  py-test:
+  check:
     runs-on: ubuntu-latest
     # Timeout to protect against flaky tests locking up. Fine to extend
     timeout-minutes: 5
@@ -16,7 +16,6 @@ jobs:
         run: |
           python -m pip install poetry
           poetry install
-          poetry shell
       - name: Lint
         run: make lint
       - name: Test

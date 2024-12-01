@@ -4,7 +4,6 @@
 
 1. Install `poetry`
 2. `poetry install` setup venv
-3. `poetry shell` to activate venv
 
 # Run
 
