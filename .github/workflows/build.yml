@@ -1,0 +1,20 @@
+name: Build
+on:
+  push:
+
+jobs:
+  py-test:
+    runs-on: linux
+    # Timeout to protect against flaky tests locking up. Fine to extend
+    timeout-minutes: 5
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Python dependencies
+        run: |
+          poetry install
+          poetry shell
+      - name: Lint
+        run: make lint
+      - name: Test
+        run: make test
