@@ -5,7 +5,6 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    # Timeout to protect against flaky tests locking up. Fine to extend
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
