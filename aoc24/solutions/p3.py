@@ -4,6 +4,8 @@ from aoc24.helpers.main import run_solution
 
 
 def seek_mul(input: str, start: int, end: int | None = None) -> tuple[int, int] | None:
+    # find a mul(X,Y) in range [start, end) and return (X*Y, index of the ')') if an instruction is found
+    # else None
     index = start
     while (index := input.find("mul(", index, end)) != -1:
         index += 4
@@ -25,6 +27,8 @@ def seek_mul(input: str, start: int, end: int | None = None) -> tuple[int, int] 
 
 
 def seek_do_dont(input: str, start: int) -> tuple[bool, int] | None:
+    # find a do() or don't() instruction in input[start:] and (enabled, index of the next char) if an instruction is
+    # found else None
     index = start
     while (index := input.find("do", index)) != -1:
         index += 2
@@ -53,13 +57,15 @@ def p3b(f: TextIO) -> int:
     while True:
         do_dont = seek_do_dont(input, index)
         if enabled:
+            # if enabled, find mul instructions between current index and the next do/dont instruction, if there is one,
+            # else end of the input
             while mul := seek_mul(input, index, do_dont[1] if do_dont else None):
                 total += mul[0]
                 index = mul[1]
         if do_dont is None:
             break
+        # scan from the next do/dont instruction
         enabled, index = do_dont
-    print(total)
     return total
 
 
