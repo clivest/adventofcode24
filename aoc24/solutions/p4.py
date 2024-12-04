@@ -20,21 +20,16 @@ class Offset:
 Grid = list[str]
 
 
-directions = [
-    Offset(*d) for d in itertools.product([0, 1, -1], repeat=2) if d != (0, 0)
-]
-
-
 def get_character(input: Grid, pos: Coord) -> str | None:
     if not (0 <= pos.i < len(input)) or not (0 <= pos.j < len(input[0])):
         return None
     return input[pos.i][pos.j]
 
 
-def walk_grid(input: Grid) -> Generator[Coord, None, None]:
+def iter_grid(input: Grid) -> Generator[tuple[Coord, str], None, None]:
     for i in range(len(input)):
         for j in range(len(input[i])):
-            yield Coord(i, j)
+            yield Coord(i, j), input[i][j]
 
 
 def add_coord(pos: Coord, offset: Offset) -> Coord:
@@ -51,35 +46,44 @@ def find_xmas(input: list[str], x: Coord, direction: Offset) -> bool:
     return True
 
 
+def same_row_or_col(a: Coord, b: Coord) -> bool:
+    return a.i == b.i or a.j == b.j
+
+
 def p4a(f: TextIO) -> int:
+    directions = [
+        Offset(*d) for d in itertools.product([0, 1, -1], repeat=2) if d != (0, 0)
+    ]
+
     input = f.read().split()
     count = 0
-    xs = {c for c in walk_grid(input) if get_character(input, c) == "X"}
-    for x in xs:
+    for pos, c in iter_grid(input):
+        if c != "X":
+            continue
         for direction in directions:
-            count += find_xmas(input, x, direction)
+            count += find_xmas(input, pos, direction)
     return count
 
 
-# def p4b(f: TextIO) -> int:
-#     input = f.read()
-#     index = 0
-#     total = 0
-#     enabled = True
-#     while True:
-#         do_dont = seek_do_dont(input, index)
-#         if enabled:
-#             # if enabled, find mul instructions between current index and the next do/dont instruction, if there is one,
-#             # else end of the input
-#             while mul := seek_mul(input, index, do_dont[1] if do_dont else None):
-#                 total += mul[0]
-#                 index = mul[1]
-#         if do_dont is None:
-#             break
-#         # scan from the next do/dont instruction
-#         enabled, index = do_dont
-#     return total
+def p4b(f: TextIO) -> int:
+    diagonals = [Offset(*d) for d in itertools.product([1, -1], repeat=2)]
+
+    input = f.read().split()
+    positions: dict[str, set[Coord]] = {c: set() for c in "MAS"}
+    for pos, c in iter_grid(input):
+        if c in positions:
+            positions[c].add(pos)
+
+    count = 0
+    for a in positions["A"]:
+        surrounds = {add_coord(a, d) for d in diagonals}
+        count += (
+            # diagonal adjacencies must be MMSS
+            all(len(surrounds & positions[c]) == 2 for c in "MS")
+            and same_row_or_col(*(surrounds & positions["M"]))
+        )
+    return count
 
 
 if __name__ == "__main__":
-    run_solution(p4a, None, 4)
+    run_solution(p4a, p4b, 4)
