@@ -8,7 +8,7 @@ Offset = tuple[int, int]
 Grid = list[str]
 
 
-directions: list[Offset] = [
+directions = [
     cast(Offset, d) for d in itertools.product([0, 1, -1], repeat=2) if d != (0, 0)
 ]
 
