@@ -1,11 +1,11 @@
 import itertools
 from dataclasses import dataclass
-from typing import TextIO
+from typing import TextIO, Generator
 
 from aoc24.helpers.main import run_solution
 
 
-@dataclass
+@dataclass(frozen=True)
 class Coord:
     i: int
     j: int
@@ -31,6 +31,12 @@ def get_character(input: Grid, pos: Coord) -> str | None:
     return input[pos.i][pos.j]
 
 
+def walk_grid(input: Grid) -> Generator[Coord, None, None]:
+    for i in range(len(input)):
+        for j in range(len(input[i])):
+            yield Coord(i, j)
+
+
 def add_coord(pos: Coord, offset: Offset) -> Coord:
     return Coord(pos.i + offset.i, pos.j + offset.j)
 
@@ -48,12 +54,10 @@ def find_xmas(input: list[str], x: Coord, direction: Offset) -> bool:
 def p4a(f: TextIO) -> int:
     input = f.read().split()
     count = 0
-    for i in range(len(input)):
-        for j in range(len(input[i])):
-            pos = Coord(i, j)
-            if get_character(input, pos) == "X":
-                for direction in directions:
-                    count += find_xmas(input, pos, direction)
+    xs = {c for c in walk_grid(input) if get_character(input, c) == "X"}
+    for x in xs:
+        for direction in directions:
+            count += find_xmas(input, x, direction)
     return count
 
 
