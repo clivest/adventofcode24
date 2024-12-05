@@ -27,8 +27,35 @@ def p5a(f: TextIO) -> int:
     return total
 
 
-def p5b(f: TextIO) -> None:
-    pass
+def p5b(f: TextIO) -> int:
+    before_rules: dict[int, set[int]] = {}  # k must come before vs
+    lines = iter(f)
+    for l in lines:
+        l = l.strip()
+        if not l:
+            break
+        a, b = [int(c) for c in l.split("|")]
+        before_rules.setdefault(a, set()).add(b)
+
+    total = 0
+    for l in lines:
+        update = [int(c) for c in l.strip().split(",")]
+        seen: set[int] = set()
+        for page in update:
+            if page in before_rules and (seen & before_rules[page]):
+                break
+            seen.add(page)
+        else:
+            # All rules followed
+            continue
+        nums = set(update)
+        update = sorted(
+            update,
+            key=lambda i: len(nums & before_rules[i]) if i in before_rules else 0,
+        )
+        total += update[len(update) // 2]
+    print(total)
+    return total
 
 
 if __name__ == "__main__":
