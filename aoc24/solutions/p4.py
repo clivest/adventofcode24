@@ -28,9 +28,9 @@ def get_character(input: Grid, pos: Position) -> str | None:
 
 
 def iter_grid(input: Grid) -> Generator[tuple[Position, str], None, None]:
-    for i in range(len(input)):
-        for j in range(len(input[i])):
-            yield Position(i, j), input[i][j]
+    for i, row in enumerate(input):
+        for j, c in enumerate(row):
+            yield Position(i, j), c
 
 
 def move_position(pos: Position, offset: Offset) -> Position:
