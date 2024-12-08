@@ -6,13 +6,13 @@ from aoc24.helpers.main import run_solution
 
 def can_solve(total: int, inputs: list[int]) -> bool:
     if not inputs:
+        # Finished
         return total == 0
+    # Check if we can divide or subtract the final value from the input, then solve the remaining equation
     v = inputs[-1]
-    if total % v == 0 and can_solve(total // v, inputs[:-1]):
-        return True
-    if total >= v and can_solve(total - v, inputs[:-1]):
-        return True
-    return False
+    return (total % v == 0 and can_solve(total // v, inputs[:-1])) or (
+        total >= v and can_solve(total - v, inputs[:-1])
+    )
 
 
 def p7a(f: TextIO) -> int:
