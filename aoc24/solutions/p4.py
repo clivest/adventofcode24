@@ -1,40 +1,8 @@
 import itertools
-from dataclasses import dataclass
-from typing import TextIO, Generator
+from typing import TextIO
 
+from aoc24.helpers.grid import get_character, move_position, Position, iter_grid, Offset
 from aoc24.helpers.main import run_solution
-
-
-@dataclass(frozen=True)
-class Position:
-    i: int
-    j: int
-
-
-@dataclass
-class Offset:
-    i: int
-    j: int
-
-
-Grid = list[str]
-
-
-def get_character(input: Grid, pos: Position) -> str | None:
-    if not (0 <= pos.i < len(input)) or not (0 <= pos.j < len(input[0])):
-        # Out of bounds
-        return None
-    return input[pos.i][pos.j]
-
-
-def iter_grid(input: Grid) -> Generator[tuple[Position, str], None, None]:
-    for i, row in enumerate(input):
-        for j, c in enumerate(row):
-            yield Position(i, j), c
-
-
-def move_position(pos: Position, offset: Offset) -> Position:
-    return Position(pos.i + offset.i, pos.j + offset.j)
 
 
 def find_xmas(input: list[str], x: Position, direction: Offset) -> bool:
