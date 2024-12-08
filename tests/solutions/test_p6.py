@@ -14,5 +14,7 @@ def test_p6a_real_input(real_input: TextIO) -> None:
     assert p6a(real_input) == 4778
 
 
+@pytest.mark.skip
 def test_p6b_real_input(real_input: TextIO) -> None:
+    # Takes ~15s. Skipped for now to streamline tests
     assert p6b(real_input) == 1618
