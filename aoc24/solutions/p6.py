@@ -42,7 +42,6 @@ def p6a(f: TextIO) -> int:
             visited.add(pos)
         else:
             break
-    print(len(visited))
     return len(visited)
 
 
