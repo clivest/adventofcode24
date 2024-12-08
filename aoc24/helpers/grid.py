@@ -8,7 +8,7 @@ class Position:
     j: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class Offset:
     i: int
     j: int
