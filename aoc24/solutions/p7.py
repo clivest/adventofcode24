@@ -23,7 +23,6 @@ def p7a(f: TextIO) -> int:
         inputs = [int(i) for i in rest.split()]
         if can_solve(total, inputs):
             total_solvable += total
-    print(total_solvable)
     return total_solvable
 
 
