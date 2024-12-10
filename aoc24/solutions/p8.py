@@ -48,7 +48,6 @@ def p8b(f: TextIO) -> int:
             diff = position_diff(a1, a2)
             nodes |= set(walk(a2, diff, grid_size))
             nodes |= set(walk(a1, -diff, grid_size))
-    print(len(nodes))
     return len(nodes)
 
 
