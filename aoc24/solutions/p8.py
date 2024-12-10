@@ -1,22 +1,35 @@
 from itertools import combinations
-from typing import TextIO
+from typing import TextIO, Iterable
 
 from aoc24.helpers.grid import iter_grid, Offset, Position, position_diff, move_position
 from aoc24.helpers.main import run_solution
+
+
+Antennas = dict[str, list[Position]]
 
 
 def is_valid(n: Position, grid_size: Offset) -> bool:
     return 0 <= n.i < grid_size.i and 0 <= n.j < grid_size.j
 
 
-def p8a(f: TextIO) -> int:
+def load_antennas(f: TextIO) -> tuple[Antennas, Offset]:
     antennas: dict[str, list[Position]] = {}
     grid_size = Offset(0, 0)
     for pos, c in iter_grid(f):
         if c != ".":
             antennas.setdefault(c, []).append(pos)
         grid_size = Offset(max(grid_size.i, pos.i), max(grid_size.j, pos.j))
-    grid_size += Offset(1, 1)
+    return antennas, grid_size + Offset(1, 1)
+
+
+def walk(pos: Position, step: Offset, grid_size: Offset) -> Iterable[Position]:
+    while is_valid(pos, grid_size):
+        yield pos
+        pos = move_position(pos, step)
+
+
+def p8a(f: TextIO) -> int:
+    antennas, grid_size = load_antennas(f)
     nodes: set[Position] = set()
     for ants in antennas.values():
         for a1, a2 in combinations(ants, 2):
@@ -28,7 +41,15 @@ def p8a(f: TextIO) -> int:
 
 
 def p8b(f: TextIO) -> int:
-    return 1
+    antennas, grid_size = load_antennas(f)
+    nodes: set[Position] = set()
+    for ants in antennas.values():
+        for a1, a2 in combinations(ants, 2):
+            diff = position_diff(a1, a2)
+            nodes |= set(walk(a2, diff, grid_size))
+            nodes |= set(walk(a1, -diff, grid_size))
+    print(len(nodes))
+    return len(nodes)
 
 
 if __name__ == "__main__":
