@@ -13,6 +13,14 @@ class Offset:
     i: int
     j: int
 
+    def __add__(self, other) -> "Offset":
+        if isinstance(other, Offset):
+            return Offset(self.i + other.i, self.j + other.j)
+        return NotImplemented
+
+    def __neg__(self) -> "Offset":
+        return Offset(-self.i, -self.j)
+
 
 Grid = list[str]
 
@@ -32,3 +40,7 @@ def iter_grid(input: Grid | TextIO) -> Generator[tuple[Position, str], None, Non
 
 def move_position(pos: Position, offset: Offset) -> Position:
     return Position(pos.i + offset.i, pos.j + offset.j)
+
+
+def position_diff(a: Position, b: Position) -> Offset:
+    return Offset(b.i - a.i, b.j - a.j)
