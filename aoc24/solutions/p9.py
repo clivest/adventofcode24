@@ -43,7 +43,7 @@ def p9a(f: TextIO) -> int:
     idx = 0
     for block_id, block_len in disk_map:
         if block_id is not None:
-            total += block_id * sum(range(idx, idx + block_len))
+            total += int(block_id * (block_len / 2) * (2 * idx + block_len - 1))
         idx += block_len
     return total
 
