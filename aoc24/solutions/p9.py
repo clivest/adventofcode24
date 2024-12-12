@@ -28,16 +28,17 @@ def p9a(f: TextIO) -> int:
         is_gap = not is_gap
 
     gap_idx = find_gap(disk_map)
-    while gap_idx is not None:
+    while gap_idx is not None and gap_idx < len(disk_map) -1:
         block_id, block_len = disk_map.pop()
-        _, gap_len =  disk_map[gap_idx]
+        _, gap_len = disk_map[gap_idx]
         if block_id is None:
-            break
+            continue
         disk_map[gap_idx] = (block_id, min(block_len, gap_len))
         if block_len > gap_len:
             disk_map.append((block_id, block_len - gap_len))
         elif gap_len > block_len:
             disk_map.insert(gap_idx + 1, (None, gap_len-block_len))
+        gap_idx = find_gap(disk_map)
 
     total = 0
     idx = 0
@@ -45,7 +46,9 @@ def p9a(f: TextIO) -> int:
         if block_id is not None:
             total += block_id * sum(range(idx, idx+block_len+1))
         idx += block_len
+    print(disk_map)
     print(total)
+    assert total == 8483642109742
     return 1
 
 
