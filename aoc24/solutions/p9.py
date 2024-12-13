@@ -86,7 +86,6 @@ def p9b(f: TextIO) -> int:
         if block_idx is None:
             continue
         gap_idx = find_gap_at_least(disk_map, block_len)
-        # print(i, block_id, gap_idx, gap_len, gaps[gap_len] if gap_len else None)
         if gap_idx is None or gap_idx > block_idx:
             continue
         _, gap_len = disk_map[gap_idx]
