@@ -15,4 +15,4 @@ def test_p10a_real_input(real_input: TextIO) -> None:
 
 
 def test_p10b_real_input(real_input: TextIO) -> None:
-    assert p10b(real_input) == 1
+    assert p10b(real_input) == 1805

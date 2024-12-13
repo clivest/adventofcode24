@@ -30,7 +30,20 @@ def score(head: Position, grid: Grid) -> set[Position]:
     return tops
 
 
-def p10a(f: TextIO) -> int:
+def rating(head: Position, grid: Grid) -> int:
+    height = get_height(grid, head)
+    assert height is not None
+    if height == 9:
+        return 1
+    r = 0
+    for d in directions:
+        pos = move_position(head, d)
+        if (h := get_height(grid, pos)) is not None and h == height + 1:
+            r += rating(pos, grid)
+    return r
+
+
+def load_grid(f: TextIO) -> tuple[Grid, list[Position]]:
     grid: Grid = []
     trail_heads: list[Position] = []
     for i, l in enumerate(f):
@@ -39,15 +52,19 @@ def p10a(f: TextIO) -> int:
             grid[-1].append(int(c))
             if c == "0":
                 trail_heads.append(Position(i, j))
-    scores = 0
-    for head in trail_heads:
-        scores += len(score(head, grid))
-    print(scores)
+    return grid, trail_heads
+
+
+def p10a(f: TextIO) -> int:
+    grid, trail_heads = load_grid(f)
+    scores = sum(len(score(head, grid)) for head in trail_heads)
     return scores
 
 
 def p10b(f: TextIO) -> int:
-    return 1
+    grid, trail_heads = load_grid(f)
+    ratings = sum(rating(head, grid) for head in trail_heads)
+    return ratings
 
 
 if __name__ == "__main__":
