@@ -14,5 +14,5 @@ def test_p9a_real_input(real_input: TextIO) -> None:
     assert p9a(real_input) == 6519155389266
 
 
-def test_p8b_real_input(real_input: TextIO) -> None:
-    assert p9b(real_input) == 1
+def test_p9b_real_input(real_input: TextIO) -> None:
+    assert p9b(real_input) == 6547228115826
