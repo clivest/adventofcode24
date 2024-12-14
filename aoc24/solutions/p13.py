@@ -20,7 +20,8 @@ def parse_position(input: str) -> Position:
 def play_min(
     l: Offset, r: Offset, prize: Position, l_cost: int, r_cost: int
 ) -> int | None:
-    # minimise number of `l` button presses
+    # minimise number of `r` button presses
+    # start on the max possible l and work backwards until a solution is found
     l_count_max = int(
         position_diff(prize, Position(0, 0)).magnitude() / l.magnitude() + 1
     )
