@@ -84,7 +84,6 @@ def p12b(f: TextIO) -> int:
     plots = load_plots(f)
     regions = group_into_regions(plots)
     total = sum(len(region) * num_sides(region) for region in regions)
-    print(total)
     return total
 
 
