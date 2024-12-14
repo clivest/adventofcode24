@@ -27,8 +27,7 @@ def play_min(
     for l_count in range(l_count_max, 0, -1):
         r_r_count = position_diff(move_position(Position(0, 0), l * l_count), prize)
         if (
-            r_r_count.i % r.i == 0
-            and r_r_count.j % r.j == 0
+            r_r_count.i % r.i == r_r_count.j % r.j == 0
             and r_r_count.i // r.i == r_r_count.j // r.j
         ):
             r_count = r_r_count.i // r.i
