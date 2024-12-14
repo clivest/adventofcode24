@@ -13,6 +13,9 @@ class Offset:
     i: int
     j: int
 
+    def magnitude(self) -> float:
+        return (self.i**2 + self.j**2) ** 0.5
+
     def __add__(self, other) -> "Offset":
         if isinstance(other, Offset):
             return Offset(self.i + other.i, self.j + other.j)
@@ -20,6 +23,11 @@ class Offset:
 
     def __neg__(self) -> "Offset":
         return Offset(-self.i, -self.j)
+
+    def __mul__(self, other) -> "Offset":
+        if isinstance(other, int):
+            return Offset(self.i * other, self.j * other)
+        return NotImplemented
 
 
 Grid = list[str]
