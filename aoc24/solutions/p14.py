@@ -15,6 +15,12 @@ def simulate(p: Position, v: Offset, reps: int, grid_size: Offset) -> Position:
     return Position(np.i % grid_size.i, np.j % grid_size.j)
 
 
+def quadrant(p: Position, grid_size: Offset) -> int | None:
+    if p.i == grid_size.i // 2 or p.j == grid_size.j // 2:
+        return None
+    return ((p.i > grid_size.i // 2) << 1) + (p.j > grid_size.j // 2)
+
+
 def p14a(f: TextIO) -> int:
     grid_size = Offset(101, 103)
     robots = []
@@ -24,16 +30,9 @@ def p14a(f: TextIO) -> int:
     positions = [simulate(p, v, 100, grid_size) for p, v in robots]
     quads = {i: 0 for i in range(4)}
     for robot in positions:
-        if robot.i < 50 and robot.j < 51:
-            quads[0] += 1
-        if robot.i > 50 and robot.j < 51:
-            quads[1] += 1
-        if robot.i < 50 and robot.j > 51:
-            quads[2] += 1
-        if robot.i > 50 and robot.j > 51:
-            quads[3] += 1
-    safety_factor = reduce(operator.mul, quads.values(), 1)
-    return safety_factor
+        if (quad := quadrant(robot, grid_size)) is not None:
+            quads[quad] += 1
+    return reduce(operator.mul, quads.values(), 1)
 
 
 def p14b(f: TextIO) -> int:
