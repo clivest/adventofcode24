@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Generator, TextIO
+from typing import Generator, TextIO, Callable
 
 
 @dataclass(frozen=True)
@@ -40,8 +40,12 @@ def get_character(input: Grid, pos: Position) -> str | None:
     return input[pos.i][pos.j]
 
 
-def iter_grid(input: Grid | TextIO) -> Generator[tuple[Position, str], None, None]:
+def iter_grid(
+    input: Grid | TextIO, *, stop: Callable[[str], bool] = lambda l: False
+) -> Generator[tuple[Position, str], None, None]:
     for i, row in enumerate(input):
+        if stop(row.strip()):
+            return
         for j, c in enumerate(row.strip()):
             yield Position(i, j), c
 
