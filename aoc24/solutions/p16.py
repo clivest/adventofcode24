@@ -20,6 +20,7 @@ class HeapItem:
     cost: int
     position: Position
     move: Offset
+    from_: tuple[Position, Offset] | None
 
     def __lt__(self, other):
         if isinstance(other, HeapItem):
@@ -44,9 +45,9 @@ def possible_moves(start: HeapItem, grid: Grid) -> Iterable[HeapItem]:
     # Possibilities: forwards 1 or rotation 90 degrees each way
     new_pos = move_position(start.position, start.move)
     if get_character(grid, new_pos) in [".", "E"]:
-        yield HeapItem(start.cost + 1, new_pos, start.move)
+        yield HeapItem(start.cost + 1, new_pos, start.move, start.pos_move)
     for new_move in rotations(start.move):
-        yield HeapItem(start.cost + 1000, start.position, new_move)
+        yield HeapItem(start.cost + 1000, start.position, new_move, start.pos_move)
 
 
 def find_char(grid: Grid, search: str) -> Position:
@@ -59,7 +60,7 @@ def find_char(grid: Grid, search: str) -> Position:
 def p16a(f: TextIO) -> int:
     grid = [l.strip() for l in f]
     start = find_char(grid, "S")
-    costs_heap = [HeapItem(0, start, Offset(0, 1))]
+    costs_heap = [HeapItem(0, start, Offset(0, 1), None)]
     searched: set[tuple[Position, Offset]] = set()
     while True:
         current_state: HeapItem = heappop(costs_heap)
@@ -91,38 +92,40 @@ def p16b(f: TextIO) -> int:
     grid = [l.strip() for l in f]
     start = find_char(grid, "S")
     end = find_char(grid, "E")
-    costs_heap = [HeapItem(0, start, Offset(0, 1))]
-    searched: set[tuple[Position, Offset]] = set()
-    paths: dict[tuple[Position, Offset], tuple[int, set[Position]]] = {
-        (start, Offset(0, 1)): (0, set())
-    }
+    costs_heap = [HeapItem(0, start, Offset(0, 1), None)]
+    paths: dict[tuple[Position, Offset], tuple[int, set[Position]]] = {}
     end_cost = None
-
-    def track_path(new_state: HeapItem, from_: tuple[Position, Offset]) -> None:
-        # track the new possible path
-        key = new_state.pos_move
-        if key not in paths or paths[key][0] > new_state.cost:
-            paths[key] = (new_state.cost, paths[from_][1] | {from_[0]})
-        elif paths[key][0] == new_state.cost:
-            paths[key][1].update(paths[from_][1] | {from_[0]})
-
-        heappush(costs_heap, new_state)
 
     while True:
         current_state: HeapItem = heappop(costs_heap)
-        if current_state.pos_move in searched:
+        if current_state.pos_move in paths:
             # the heap may include states that we've already searched. Skip until we find a (position, move) state we've
             # not yet searched
+            if current_state.cost == paths[current_state.pos_move][0]:
+                # Alternative route to current_state.pos_move with the same cost. Track the path elements
+                paths[current_state.pos_move][1].update(
+                    paths[current_state.from_][1] | {current_state.from_[0]}
+                    if current_state.from_
+                    else set()
+                )
             continue
         if end_cost and current_state.cost > end_cost:
             break
         if current_state.position == end:
             end_cost = current_state.cost
         for new_state in possible_moves(current_state, grid):
-            track_path(new_state, current_state.pos_move)
-        searched.add(current_state.pos_move)
+            heappush(costs_heap, new_state)
+        # first path to current_state. Track it
+        paths[current_state.pos_move] = (
+            current_state.cost,
+            paths[current_state.from_][1] | {current_state.from_[0]}
+            if current_state.from_
+            else set(),
+        )
 
-    path_elems = {p for d in directions for p in paths.get((end, d), (None, set()))[1]}
+    path_elems = {
+        p for d in directions for p in paths.get((end, d), (None, set()))[1]
+    } | {end}
     print_grid_min_path(grid, path_elems)
     return len(path_elems)
 
