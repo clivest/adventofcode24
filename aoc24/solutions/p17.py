@@ -89,16 +89,6 @@ def p17a(f: TextIO) -> str:
     return ",".join(map(str, output))
 
 
-# 2,4 B = A % 8
-# 1,5 B = B XOR 0b101
-# 7,5 C = A // (2**B)
-# 1,6 B = B XOR 0b110
-# 4,1 B = B XOR C
-# 5,5 out B % 8
-# 0,3 A=A//8
-# 3,0 jump 0
-
-
 def find_a_for_output(
     a_start: int, registers: Registers, program: str, output: list[int]
 ) -> int:
@@ -110,6 +100,17 @@ def find_a_for_output(
 
 
 def p17b(f: TextIO) -> int:
+    # Program:
+    # 2,4 B = A % 8 (= A & 0b111)
+    # 1,5 B = B XOR 0b101
+    # 7,5 C = A // (2**B) (= A >> B)
+    # 1,6 B = B XOR 0b110
+    # 4,1 B = B XOR C
+    # 5,5 out B % 8
+    # 0,3 A = A//8 (= A >> 3)
+    # 3,0 jump 0
+    # Start from the back. Find A needed to output the final number, <<=3 to reverse the 0,3 instruction then find A
+    # needed to output final 2 numbers. Repeat to find A needed to output all numbers
     registers = load_registers(f)
     program = f.read().split(": ")[1]
     required_output = [int(i) for i in program.split(",")]
