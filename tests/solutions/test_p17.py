@@ -3,7 +3,7 @@ from typing import TextIO
 
 import pytest
 
-from aoc24.solutions.p17 import Registers, run_program, p17a
+from aoc24.solutions.p17 import Registers, run_program, p17a, p17b
 
 
 @pytest.fixture
@@ -46,5 +46,9 @@ def test_p17a_sample_input() -> None:
     assert p17a(input) == "4,6,3,5,6,3,5,2,1,0"
 
 
-def test_p17b_real_input(real_input: TextIO) -> None:
+def test_p17a_real_input(real_input: TextIO) -> None:
     assert p17a(real_input) == "3,5,0,1,5,1,5,1,0"
+
+
+def test_p17b_real_input(real_input: TextIO) -> None:
+    assert p17b(real_input) == 107413700225434

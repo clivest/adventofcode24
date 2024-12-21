@@ -1,4 +1,5 @@
 import re
+from itertools import count
 from typing import TextIO, Callable
 from aoc24.helpers.main import run_solution
 
@@ -70,7 +71,7 @@ def run_program(registers: Registers, ps: str) -> list[int]:
     return all_output
 
 
-def p17a(f: TextIO) -> str:
+def load_registers(f: TextIO) -> Registers:
     registers: Registers = {}
     for l in f:
         l = l.strip()
@@ -79,13 +80,44 @@ def p17a(f: TextIO) -> str:
         match = re.match(r"Register ([A-Z]): (\d+)", l)
         assert match and match.group(1) not in registers
         registers[match.group(1)] = int(match.group(2))
+    return registers
 
+
+def p17a(f: TextIO) -> str:
+    registers = load_registers(f)
     output = run_program(registers, f.read().split(": ")[1])
     return ",".join(map(str, output))
 
 
-def p17b(f: TextIO) -> str:
-    return "1"
+# 2,4 B = A % 8
+# 1,5 B = B XOR 0b101
+# 7,5 C = A // (2**B)
+# 1,6 B = B XOR 0b110
+# 4,1 B = B XOR C
+# 5,5 out B % 8
+# 0,3 A=A//8
+# 3,0 jump 0
+
+
+def find_a_for_output(
+    a_start: int, registers: Registers, program: str, output: list[int]
+) -> int:
+    for a in count(a_start):
+        registers = registers.copy() | {"A": a}
+        if run_program(registers, program) == output:
+            return a
+    assert False
+
+
+def p17b(f: TextIO) -> int:
+    registers = load_registers(f)
+    program = f.read().split(": ")[1]
+    required_output = [int(i) for i in program.split(",")]
+    a = 0
+    for pos in range(len(required_output)):
+        a <<= 3
+        a = find_a_for_output(a, registers, program, required_output[-pos - 1 :])
+    return a
 
 
 if __name__ == "__main__":
