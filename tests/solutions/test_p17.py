@@ -52,3 +52,14 @@ def test_p17a_real_input(real_input: TextIO) -> None:
 
 def test_p17b_real_input(real_input: TextIO) -> None:
     assert p17b(real_input) == 107413700225434
+
+
+def test_p17b_another_real_input(real_input: TextIO) -> None:
+    # My brothers input which didn't work on my original algorithm
+    input = """
+Register A: 46337277
+Register B: 0
+Register C: 0
+
+Program: 2,4,1,1,7,5,4,4,1,4,0,3,5,5,3,0"""
+    assert p17b(StringIO(input.strip())) == 202991746427434
