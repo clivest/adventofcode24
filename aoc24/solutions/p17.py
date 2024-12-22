@@ -1,5 +1,4 @@
 import re
-from itertools import count
 from typing import TextIO, Callable
 from aoc24.helpers.main import run_solution
 
@@ -57,8 +56,8 @@ operand_table: dict[int, Callable[[Registers], int]] = {
 }
 
 
-def run_program(registers: Registers, ps: str) -> list[int]:
-    program = [int(i) for i in ps.split(",")]
+def run_program(registers: Registers, ps: str | list[int]) -> list[int]:
+    program = [int(i) for i in ps.split(",")] if not isinstance(ps, list) else ps
     registers["I"] = 0
     all_output = []
     while registers["I"] < len(program):
@@ -90,13 +89,22 @@ def p17a(f: TextIO) -> str:
 
 
 def find_a_for_output(
-    a_start: int, registers: Registers, program: str, output: list[int]
-) -> int:
-    for a in count(a_start):
+    a_start: int,
+    registers: Registers,
+    program: list[int],
+    match_len: int,
+) -> int | None:
+    for a in range(a_start, a_start + 9):
         registers = registers.copy() | {"A": a}
-        if run_program(registers, program) == output:
-            return a
-    assert False
+        if run_program(registers, program) == program[-match_len:]:
+            if match_len == len(program):
+                # Found the answer!
+                return a
+            if result := find_a_for_output(a << 3, registers, program, match_len + 1):
+                # recurse to run the depth first search
+                return result
+    # dead end
+    return None
 
 
 def p17b(f: TextIO) -> int:
@@ -111,13 +119,12 @@ def p17b(f: TextIO) -> int:
     # 3,0 jump 0
     # Start from the back. Find A needed to output the final number, <<=3 to reverse the 0,3 instruction then find A
     # needed to output final 2 numbers. Repeat to find A needed to output all numbers
+    # Turns out some programs encounter a dead end when run this way. Needs a depth first search
     registers = load_registers(f)
     program = f.read().split(": ")[1]
     required_output = [int(i) for i in program.split(",")]
-    a = 0
-    for pos in range(len(required_output)):
-        a <<= 3
-        a = find_a_for_output(a, registers, program, required_output[-pos - 1 :])
+    a = find_a_for_output(0, registers, required_output, 1)
+    assert a
     return a
 
 
