@@ -6,6 +6,14 @@ from aoc24.helpers.main import run_solution
 
 Keypad = dict[str, Position]
 
+dpad = {
+    "^": Position(0, 1),
+    "A": Position(0, 2),
+    "<": Position(1, 0),
+    "v": Position(1, 1),
+    ">": Position(1, 2),
+}
+
 
 def min_paths(code: str, pos: Position, keypad: Keypad, gap: Position) -> Iterable[str]:
     if not code:
@@ -32,35 +40,37 @@ def min_paths_r1(code: str) -> Iterable[str]:
 
 
 def min_paths_rn(code: str) -> Iterable[str]:
-    keypad = {
-        "^": Position(0, 1),
-        "A": Position(0, 2),
-        "<": Position(1, 0),
-        "v": Position(1, 1),
-        ">": Position(1, 2),
-    }
-    return min_paths(code, keypad["A"], keypad, Position(0, 0))
+    return min_paths(code, dpad["A"], dpad, Position(0, 0))
+
+
+def move_count(dcode: str) -> int:
+    def mc(p1: Position, p2: Position) -> int:
+        return abs(p1.i - p2.i) + abs(p1.j - p2.j)
+
+    return sum(mc(dpad[c1], dpad[c2]) for c1, c2 in zip(dcode, dcode[1:]))
+
+
+def calc_complexity(code: str, robots: int) -> int:
+    paths = set(min_paths_r1(code))
+    for i in range(robots - 1):
+        paths = set().union(new_path for p in paths for new_path in min_paths_rn(p))
+        min_len = min(len(p) for p in paths)
+        paths = {p for p in paths if len(p) == min_len}
+        dir_changes = {p: move_count(p) for p in paths}
+        min_dir_changes = min(dir_changes.values())
+        paths = {p for p in paths if dir_changes[p] == min_dir_changes}
+    return min(len(p) for p in paths) * int(code[:-1], base=10)
 
 
 def p21a(f: TextIO) -> int:
-    complexity = 0
-    for l in f:
-        code = l.strip()
-        min_path_len: int | None = None
-        for p1 in min_paths_r1(code):
-            for p2 in min_paths_rn(p1):
-                for p3 in min_paths_rn(p2):
-                    min_path_len = (
-                        min(min_path_len, len(p3)) if min_path_len else len(p3)
-                    )
-        assert min_path_len
-        complexity += min_path_len * int(code[:-1], base=10)
-    print(complexity)
-    return complexity
+    return sum(calc_complexity(l.strip(), 3) for l in f)
 
 
 def p21b(f: TextIO) -> int:
     return 1
+    # c = sum(calc_complexity(l.strip(), 26) for l in f)
+    # print(c)
+    # return c
 
 
 if __name__ == "__main__":
