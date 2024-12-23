@@ -26,11 +26,12 @@ directions = [Offset(0, 1), Offset(1, 0), Offset(-1, 0), Offset(0, -1)]
 
 
 def determine_min_path(
-    start: Position, end: Position, obstacles: list[Position], grid_size: Offset
+    start: Position, end: Position, obstacles_list: list[Position], grid_size: Offset
 ) -> set[Position]:
     # p16.py also has a djikstra algorithm. TODO: refactor out a common implementation!
     searched: set[Position] = set()
     paths: list[HeapItem] = [HeapItem(start, 0, set())]
+    obstacles = set(obstacles_list)
     while True:
         if not paths:
             raise NoPathFoundError
