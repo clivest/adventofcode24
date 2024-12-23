@@ -30,6 +30,9 @@ class Offset:
         return NotImplemented
 
 
+vh_directions = [Offset(0, 1), Offset(1, 0), Offset(-1, 0), Offset(0, -1)]
+
+
 Grid = list[str]
 
 
