@@ -30,6 +30,9 @@ class Offset:
         return NotImplemented
 
 
+vh_directions = [Offset(0, 1), Offset(1, 0), Offset(-1, 0), Offset(0, -1)]
+
+
 Grid = list[str]
 
 
@@ -48,6 +51,17 @@ def iter_grid(
             return
         for j, c in enumerate(row.strip()):
             yield Position(i, j), c
+
+
+def load_grid(
+    input: Grid | TextIO, *, stop: Callable[[str], bool] = lambda l: False
+) -> tuple[dict[str, set[Position]], Offset]:
+    elems: dict[str, set[Position]] = {}
+    grid_size = Offset(0, 0)
+    for p, c in iter_grid(input, stop=stop):
+        elems.setdefault(c, set()).add(p)
+        grid_size = Offset(max(grid_size.i, p.i + 1), max(grid_size.j, p.j + 1))
+    return elems, grid_size
 
 
 def move_position(pos: Position, offset: Offset) -> Position:
