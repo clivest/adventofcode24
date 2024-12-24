@@ -15,4 +15,4 @@ def test_p22a_real_input(real_input: TextIO) -> None:
 
 
 def test_p22b_real_input(real_input: TextIO) -> None:
-    assert p22b(real_input) == 1
+    assert p22b(real_input) == 1863
