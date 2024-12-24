@@ -5,6 +5,7 @@ from aoc24.helpers.main import run_solution
 
 
 Connected3 = tuple[str, str, str]
+ConnectedSets = dict[str, set[tuple[str, ...]]]
 
 
 def load_connections(f: TextIO) -> dict[str, set[str]]:
@@ -29,29 +30,34 @@ def p23a(f: TextIO) -> int:
 
 
 def p23b(f: TextIO) -> str:
-    connections: list[dict[str, set[tuple[str, ...]]]] = [
-        {k: {(vi,) for vi in v} for k, v in load_connections(f).items()}
-    ]
+    connections = load_connections(f)
+    # the largest set must contain the historian (i.e. contain a node starting with t)
+    # for subsequent iterations, the connected set key will be the first element in the connected set (sorted
+    # alphabetically)
+    connected_sets: ConnectedSets = {
+        k: {(vi,) for vi in v} for k, v in connections.items() if k.startswith("t")
+    }
     while True:
-        print(len(connections), len(connections[-1]))
-        cons: dict[str, set[tuple[str, ...]]] = {}
-        for node in connections[-1]:
-            for others in combinations(connections[-1][node], 2):
-                s0, s1 = (set(s) for s in others)
-                if len(s0 - s1) != 1:
+        connected_sets_next: ConnectedSets = {}
+        for node in connected_sets:
+            # look at all possible parings of groups that contain `node`. Find ones with a difference of 1 and where
+            # there's a connection between the 2 differing elements
+            for others in combinations(connected_sets[node], 2):
+                a = [n for n in others[0] if n not in others[1]]
+                if len(a) != 1:
                     continue
-                a, b = (s0 - s1).pop(), (s1 - s0).pop()
-                if (b,) in connections[0][a]:
-                    t = tuple(sorted((b, node) + others[0]))
-                    cons.setdefault(t[0], set()).add(t[1:])
-        if not cons:
+                b = [n for n in others[1] if n not in others[0]]
+                assert len(b) == 1
+                if b[0] in connections[a[0]]:
+                    t = tuple(sorted((b[0], node) + others[0]))
+                    connected_sets_next.setdefault(t[0], set()).add(t[1:])
+        if not connected_sets_next:
             break
-        connections.append(cons)
-    assert len(connections[-1]) == 1
-    k, grp = connections[-1].popitem()
+        connected_sets = connected_sets_next
+    assert len(connected_sets) == 1
+    k, grp = connected_sets.popitem()
     assert len(grp) == 1
-    code = ",".join((k,) + grp.pop())
-    return code
+    return ",".join((k,) + grp.pop())
 
 
 if __name__ == "__main__":
