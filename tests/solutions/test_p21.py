@@ -15,4 +15,4 @@ def test_p21a_real_input(real_input: TextIO) -> None:
 
 
 def test_p21b_real_input(real_input: TextIO) -> None:
-    assert p21b(real_input) == 1
+    assert p21b(real_input) == 205620604017764

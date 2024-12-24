@@ -1,3 +1,4 @@
+from functools import cache
 from typing import TextIO, Iterable
 
 from aoc24.helpers.grid import Position
@@ -50,16 +51,39 @@ def move_count(dcode: str) -> int:
     return sum(mc(dpad[c1], dpad[c2]) for c1, c2 in zip(dcode, dcode[1:]))
 
 
+def moves_() -> dict[tuple[str, str], set[str]]:
+    mvs = {}
+    gap = Position(0,0)
+    for a, pos in dpad.items():
+        for b, dest in dpad.items():
+            v = ("^" if dest.i < pos.i else "v") * abs(dest.i - pos.i)
+            h = (">" if dest.j > pos.j else "<") * abs(dest.j - pos.j)
+            mvs_i = set()
+            if not (pos.j == gap.j and dest.i == gap.i):
+                mvs_i.add(v + h + "A")
+            if not (pos.i == gap.i and dest.j == gap.j):
+                mvs_i.add(h + v + 'A')
+            mvs[(a,b)] = mvs_i
+    return mvs
+
+
+moves = moves_()
+
+@cache
+def calc_move_len(start: str, target: str, depth: int) -> int:
+    seqs = moves[(start, target)]
+    if depth == 0:
+        return min(len(seq) for seq in seqs)
+    return min(sum(calc_move_len(s, t, depth - 1) for s, t in zip('A' + seq, seq)) for seq in seqs)
+
+
+def calc_path_len(path: str, depth: int) -> int:
+    return sum(calc_move_len(s, t, depth-1) for s, t in zip('A' + path, path))
+
+
 def calc_complexity(code: str, robots: int) -> int:
     paths = set(min_paths_r1(code))
-    for i in range(robots - 1):
-        paths = set().union(new_path for p in paths for new_path in min_paths_rn(p))
-        min_len = min(len(p) for p in paths)
-        paths = {p for p in paths if len(p) == min_len}
-        dir_changes = {p: move_count(p) for p in paths}
-        min_dir_changes = min(dir_changes.values())
-        paths = {p for p in paths if dir_changes[p] == min_dir_changes}
-    return min(len(p) for p in paths) * int(code[:-1], base=10)
+    return min(calc_path_len(p, robots-1) for p in paths) * int(code[:-1], base=10)
 
 
 def p21a(f: TextIO) -> int:
@@ -67,10 +91,9 @@ def p21a(f: TextIO) -> int:
 
 
 def p21b(f: TextIO) -> int:
-    return 1
-    # c = sum(calc_complexity(l.strip(), 26) for l in f)
-    # print(c)
-    # return c
+    c = sum(calc_complexity(l.strip(), 26) for l in f)
+    print(c)
+    return c
 
 
 if __name__ == "__main__":
