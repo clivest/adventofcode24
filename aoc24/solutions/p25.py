@@ -15,8 +15,7 @@ def p25a(f: TextIO) -> int:
             (locks if is_lock else keys).add(v)
             v = ()
             is_lock = None
-            continue
-        if is_lock is None:
+        elif is_lock is None:
             is_lock = all(c == "#" for c in l)
             v = tuple(c == "#" for c in l)
         else:
@@ -24,10 +23,9 @@ def p25a(f: TextIO) -> int:
     if v:
         assert is_lock is not None
         (locks if is_lock else keys).add(v)
-    fit = 0
-    for lock in locks:
-        for key in keys:
-            fit += all(li + vi <= 7 for li, vi in zip(lock, key))
+    fit = sum(
+        all(li + vi <= 7 for li, vi in zip(lock, key)) for lock in locks for key in keys
+    )
     return fit
 
 
