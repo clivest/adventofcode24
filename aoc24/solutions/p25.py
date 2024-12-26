@@ -29,9 +29,6 @@ def p25a(f: TextIO) -> int:
     return fit
 
 
-def p25b(f: TextIO) -> int:
-    return 1
-
-
 if __name__ == "__main__":
-    run_solution(p25a, p25b, 25)
+    # No part b today
+    run_solution(p25a, None, 25)
