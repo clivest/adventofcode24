@@ -66,6 +66,7 @@ def p24b(f: TextIO) -> str:
     # Works only because the bugs are simple and easy to see. TODO: a generic solution!
     swaps = [("rts", "z07"), ("jpj", "z12"), ("kgj", "z26"), ("vvw", "chv")]
     err_count = 0
+    # Check x+0 and y+0 to check operation with no carries
     for v in range(bits):
         for x, y in [(1 << v, 0), (0, 1 << v)]:
             wires = set_wires(x, y, bits)
@@ -73,6 +74,7 @@ def p24b(f: TextIO) -> str:
             if z != 1 << v:
                 print(v, x, y, z)
                 err_count += 1
+    # Check x+x to check carry operation
     for v in range(bits):
         wires = set_wires(1 << v, 1 << v, bits)
         z = run_system(wires, gates, swaps)
